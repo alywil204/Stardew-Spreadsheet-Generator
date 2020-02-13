@@ -1,5 +1,6 @@
 from pywikiapi import *
 import sys
+import os
 
 
 
@@ -160,9 +161,10 @@ def get_item_info(item_name, site):
 		start_index = wikitext.index("[[") + 2
 		end_index = wikitext.index("]]")
 		page_name = wikitext[start_index:end_index]
-	"""fname = item_name + ".txt"
-	with open(fname, "w", encoding="utf-8") as f:
-		f.write(wikitext)"""
+	if download_files:
+		fname = "wiki_pages\\" + item_name + ".txt"
+		with open(fname, "w", encoding="utf-8") as f:
+			f.write(wikitext)
 
 	info_end = get_info_box_end(wikitext)
 	spring = summer = fall = winter = False
@@ -175,7 +177,6 @@ def get_item_info(item_name, site):
 		summer = season_name.find("Summer") >= 0
 		fall = season_name.find("Fall") >= 0
 		winter = season_name.find("Winter") >= 0
-		#print(spring, summer, fall, winter)
 	except:
 		pass
 	if ((not spring) and (not summer) and (not fall) and (not winter)):
@@ -203,8 +204,9 @@ def get_info_box_end(wikitext):
 	return closing
 
 def main():
-	global print_flag
-	print_flag = ("-printout") in sys.argv
+	global print_flag, download_files
+	print_flag = ("-p") in sys.argv
+	download_files = ("-f") in sys.argv
 	
 	site = Site("https://stardewvalleywiki.com/mediawiki/api.php")
 
@@ -212,10 +214,14 @@ def main():
 
 	if print_flag: print("Querying Bundles")
 
-	# Uncomment to save xml to a file 
-	"""fname = "Bundles.txt"
-	with open(fname, "w", encoding="utf-8") as f:
-		f.write(response["parse"]["wikitext"])"""
+	if not os.path.exists("wiki_pages"):
+		os.makedirs("wiki_pages");
+
+	# Uncomment to save xml to a file
+	if download_files:
+		fname = "wiki_pages\\Bundles.txt"
+		with open(fname, "w", encoding="utf-8") as f:
+			f.write(response["parse"]["wikitext"])
 
 	room_list = get_rooms(response["parse"]["wikitext"], site)
 	if print_flag: print("Generating csv...")
