@@ -172,11 +172,11 @@ def get_item_info(item_name, site):
 		season_index = wikitext.index("season", 0, info_end)
 		season_index = wikitext.index("=", season_index) + 2
 		season_end = wikitext.index("\n", season_index)
-		season_name = wikitext[season_index:season_end]
-		spring = season_name.find("Spring") >= 0
-		summer = season_name.find("Summer") >= 0
-		fall = season_name.find("Fall") >= 0
-		winter = season_name.find("Winter") >= 0
+		season_name = wikitext[season_index:season_end].lower()
+		spring = season_name.find("spring") >= 0
+		summer = season_name.find("summer") >= 0
+		fall = season_name.find("fall") >= 0
+		winter = season_name.find("winter") >= 0
 	except:
 		pass
 	if ((not spring) and (not summer) and (not fall) and (not winter)):
@@ -203,19 +203,38 @@ def get_info_box_end(wikitext):
 				break
 	return closing
 
+
+
+def set_print_flag(bool_val):
+	global print_flag
+	print_flag = bool_val
+
+
+
+def set_download_files(bool_val):
+	global download_files
+	download_files = bool_val
+
+
+
+def get_site():
+	return Site("https://stardewvalleywiki.com/mediawiki/api.php")
+
+
+
 def main():
-	global print_flag, download_files
-	print_flag = ("-p") in sys.argv
-	download_files = ("-f") in sys.argv
+	global download_files
+	set_print_flag(("-p") in sys.argv)
+	set_download_files(("-f") in sys.argv)
 	
-	site = Site("https://stardewvalleywiki.com/mediawiki/api.php")
+	site = get_site()
 
 	response = site(action="parse", page="Bundles", prop=["wikitext"])
 
 	if print_flag: print("Querying Bundles")
 
 	if not os.path.exists("wiki_pages"):
-		os.makedirs("wiki_pages");
+		os.makedirs("wiki_pages")
 
 	# Uncomment to save xml to a file
 	if download_files:
