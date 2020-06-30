@@ -3,5 +3,6 @@
 *.csv#
 *.ods
 *.ods#
-wiki_pages
 *.txt
+venv
+wiki_pages
