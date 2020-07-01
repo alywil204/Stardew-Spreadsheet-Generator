@@ -57,6 +57,8 @@ class Bundle:
 			string += str(i) + "\n"
 		return string
 
+
+
 class Item:
 	def __init__(self, name, spring, summer, fall, winter, description, amount=1):
 		self.name = name
@@ -223,7 +225,6 @@ def get_site():
 
 
 def main():
-	global download_files
 	set_print_flag(("-p") in sys.argv)
 	set_download_files(("-f") in sys.argv)
 	
