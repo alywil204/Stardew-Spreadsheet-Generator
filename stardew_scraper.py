@@ -29,9 +29,10 @@ class Room:
 
 	def print_csv(self, file):
 		for b in self.bundles:
-			for i in b.items:
+			for i in b.item_counts:
+				item_amount = b.item_counts[i]
 				file.write(self.name + "," + b.name + ",," + str(b.num_needed) +
-						   ",," + i.name + "," + str(i.amount) + "," +
+						   ",," + i.name + "," + str(item_amount) + "," +
 						   str(int(i.spring)) + ","+str(int(i.summer)) +
 						   "," + str(int(i.fall)) + "," +
 						   str(int(i.winter)) + "," + i.description+"\n")
@@ -46,10 +47,10 @@ class Room:
 
 class Bundle:
 
-	def __init__(self, name, num_needed, items):
+	def __init__(self, name, num_needed, item_counts):
 		self.name = name
 		self.num_needed = num_needed
-		self.items = items
+		self.item_counts = item_counts
 
 	def __str__(self):
 		string = self.name + ": " + str(self.num_needed) + "\n"
@@ -60,14 +61,13 @@ class Bundle:
 
 
 class Item:
-	def __init__(self, name, spring, summer, fall, winter, description, amount=1):
+	def __init__(self, name, spring, summer, fall, winter, description):
 		self.name = name
 		self.spring = spring
 		self.summer = summer
 		self.fall = fall
 		self.winter = winter
 		self.description = description
-		self.amount = amount
 
 
 
@@ -121,14 +121,14 @@ def read_bundles(section_text, site):
 		# Get number of slots
 		num_slots = table_text.count(SLOT_IMAGE)
 		# Get items
-		item_list = read_items(table_text, site)
-		bundle_list.append(Bundle(id_text, num_slots, item_list))
+		item_dict = read_items(table_text, site)
+		bundle_list.append(Bundle(id_text, num_slots, item_dict))
 	return bundle_list
 
 
 
 def read_items(table_text, site):
-	item_list = []
+	item_dict = {}
 	start_row = table_text.index(ROW)
 	while True:
 		try:
@@ -140,14 +140,24 @@ def read_items(table_text, site):
 		name_end = table_text.index(ITEM_END, name_start, end_row)
 		try:
 			name_end = table_text.index(ITEM_DELIM, name_start, name_end)
+			attribute_start = name_end + 1
+			attribute_end = table_text.index(ITEM_END, attribute_start, end_row)
+			# print(table_text[attribute_start-10:attribute_end])
 		except:
 			pass
 		item_name = table_text[name_start:name_end]
+		amount = 1
+		try:
+			amount = int(table_text[attribute_start:attribute_end])
+			attribute_start=-1
+			attribute_start=-1
+		except:
+			pass
 		if print_flag: print("Creating item: " + item_name)
-		item_list.append(get_item_info(item_name, site))
+		item_dict[get_item_info(item_name, site)] = amount
 
 		start_row = end_row
-	return item_list
+	return item_dict
 
 
 
