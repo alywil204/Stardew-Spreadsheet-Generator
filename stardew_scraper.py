@@ -1,6 +1,8 @@
 from pywikiapi import *
-import sys
+
 import os
+import re
+import sys
 
 
 
@@ -31,11 +33,11 @@ class Room:
 		for b in self.bundles:
 			for i in b.item_counts:
 				item_amount = b.item_counts[i]
-				file.write(self.name + "," + b.name + ",," + str(b.num_needed) +
-						   ",," + i.name + "," + str(item_amount) + "," +
-						   str(int(i.spring)) + ","+str(int(i.summer)) +
-						   "," + str(int(i.fall)) + "," +
-						   str(int(i.winter)) + "," + i.description+"\n")
+				write_items = [self.name, b.name, '', str(b.num_needed), '', i.name, str(item_amount),
+				               str(int(i.spring)), str(int(i.summer)), str(int(i.fall)), str(int(i.winter)), 
+				               i.get_clean_description()
+							   ]
+				file.write(",".join(write_items) + "\n")
 
 	def __str__(self):
 		string = self.name + "\n"
@@ -61,6 +63,7 @@ class Bundle:
 
 
 class Item:
+
 	def __init__(self, name, spring, summer, fall, winter, description):
 		self.name = name
 		self.spring = spring
@@ -68,6 +71,13 @@ class Item:
 		self.fall = fall
 		self.winter = winter
 		self.description = description
+
+	def get_clean_description(self):
+		split_links = re.split('\[\[|\]\]|\'\'\'|\{\{|\|class=inline|\}\}', self.description)
+		for i in range(len(split_links)):
+			split_links[i] = split_links[i].split('|')[-1]
+		clean_description = ''.join(split_links)
+		return clean_description
 
 
 
