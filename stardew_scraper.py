@@ -37,7 +37,7 @@ class Room:
 				               str(int(i.spring)), str(int(i.summer)), str(int(i.fall)), str(int(i.winter)), 
 				               i.get_clean_description()
 							   ]
-				file.write(",".join(write_items) + "\n")
+				file.write("\"" + "\",\"".join(write_items) + "\"\n")
 
 	def __str__(self):
 		string = self.name + "\n"
@@ -77,6 +77,7 @@ class Item:
 		for i in range(len(split_links)):
 			split_links[i] = split_links[i].split('|')[-1]
 		clean_description = ''.join(split_links)
+		clean_description = clean_description.replace("\"", "'")
 		return clean_description
 
 
@@ -266,7 +267,8 @@ def main():
 	room_list = get_rooms(response["parse"]["wikitext"], site)
 	if print_flag: print("Generating csv...")
 	stardew_csv = open("community_center.csv", "w")
-	stardew_csv.write("Room,Bundle,Completed,Amount Needed,Have Item,Item,Amount,Spring,Summer,Fall,Winter,Description\n")
+	header_items = ["Room", "Bundle", "Completed", "Amount Needed", "Have Item", "Item", "Amount", "Spring", "Summer", "Fall", "Winter", "Description"]
+	stardew_csv.write("\"" + "\",\"".join(header_items) + "\"\n")
 	for room in room_list:
 		room.print_csv(stardew_csv)
 	stardew_csv.close()
