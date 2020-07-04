@@ -75,7 +75,10 @@ class Item:
 	def get_clean_description(self):
 		split_links = re.split('\[\[|\]\]|\'\'\'|\{\{|\|class=inline|\}\}', self.description)
 		for i in range(len(split_links)):
-			split_links[i] = split_links[i].split('|')[-1]
+			split_attributes = split_links[i].split('|')
+			split_links[i] = split_attributes[-1] \
+							 + ("g" if "price" in split_attributes[0].lower() \
+							 and len(split_attributes) > 1 else "")
 		clean_description = ''.join(split_links)
 		clean_description = clean_description.replace("\"", "'")
 		return clean_description
