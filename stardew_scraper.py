@@ -33,7 +33,7 @@ class Room:
 		for b in self.bundles:
 			for i in b.item_counts:
 				item_amount = b.item_counts[i]
-				write_items = [self.name, b.name, '', str(b.num_needed), '', i.name, str(item_amount),
+				write_items = [self.name, b.name, '', str(b.num_needed), '', i.get_name(), str(item_amount),
 				               str(int(i.spring)), str(int(i.summer)), str(int(i.fall)), str(int(i.winter)), 
 				               i.get_clean_description()
 							   ]
@@ -65,12 +65,19 @@ class Bundle:
 class Item:
 
 	def __init__(self, name, spring, summer, fall, winter, description):
+		self.attributes = ""
 		self.name = name
 		self.spring = spring
 		self.summer = summer
 		self.fall = fall
 		self.winter = winter
 		self.description = description
+
+	def set_attributes(self, attributes):
+		self.attributes = attributes
+
+	def get_name(self):
+		return self.attributes + self.name
 
 	def get_clean_description(self):
 		split_links = re.split('\[\[|\]\]|\'\'\'|\{\{|\|class=inline|\}\}', self.description)
@@ -152,15 +159,18 @@ def read_items(table_text, site):
 			break
 		name_start = table_text.index(ITEM_DELIM, name_start, end_row) + 1
 		name_end = table_text.index(ITEM_END, name_start, end_row)
+		gold_quality = "gold" in table_text[name_start:name_end]
 		try:
 			name_end = table_text.index(ITEM_DELIM, name_start, name_end)
 			attribute_start = name_end + 1
 			attribute_end = table_text.index(ITEM_END, attribute_start, end_row)
-			# print(table_text[attribute_start-10:attribute_end])
 		except:
 			pass
 		item_name = table_text[name_start:name_end]
 		amount = 1
+		if "<td>" in table_text[start_row:end_row]:
+			attribute_start = table_text.index("(", start_row, end_row) + 1
+			attribute_end = table_text.index(")", start_row, end_row)
 		try:
 			amount = int(table_text[attribute_start:attribute_end])
 			attribute_start=-1
@@ -168,8 +178,10 @@ def read_items(table_text, site):
 		except:
 			pass
 		if print_flag: print("Creating item: " + item_name)
-		item_dict[get_item_info(item_name, site)] = amount
-
+		item = get_item_info(item_name, site)
+		if gold_quality:
+			item.set_attributes("Gold Quality ")
+		item_dict[item] = amount
 		start_row = end_row
 	return item_dict
 
