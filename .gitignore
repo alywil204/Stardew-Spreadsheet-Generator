@@ -4,5 +4,6 @@
 *.ods
 *.ods#
 *.txt
+__pycache__
 venv
 wiki_pages
